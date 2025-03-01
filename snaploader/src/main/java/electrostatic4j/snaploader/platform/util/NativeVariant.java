@@ -36,6 +36,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -260,73 +262,42 @@ public enum NativeVariant {
         }
 
         /**
-         * Cache the names of instruction-set architecture (ISA) extensions that
-         * are present.
-         */
-        private static final Collection<String> extNameCache = new TreeSet<>();
-
-        /**
-         * Lazily initializes the collection of ISA extensions that are present.
-         */
-        private static synchronized void initializeExtNameCache() {
-            if (extNameCache.isEmpty()) {
-                // Obtain the list of CPU features from OSHI:
-                SystemInfo si = new SystemInfo();
-                HardwareAbstractionLayer hal = si.getHardware();
-                CentralProcessor cpu = hal.getProcessor();
-                List<String> strings = cpu.getFeatureFlags();
-
-                for (String string : strings) {
-                    String lcString = string.toLowerCase(Locale.ROOT);
-
-                    // Matches to test for interesting X86 ISA extensions:
-                    if (lcString.matches(".*\\bavx\\b.*")) {
-                        extNameCache.add("avx");
-                    }
-                    if (lcString.matches(".*\\bavx2\\b.*")) {
-                        extNameCache.add("avx2");
-                    }
-                    if (lcString.matches(".*\\bbmi1\\b.*")) {
-                        extNameCache.add("bmi1");
-                    }
-                    if (lcString.matches(".*\\bf16c\\b.*")) {
-                        extNameCache.add("f16c");
-                    }
-                    if (lcString.matches(".*\\bfma\\b.*")) {
-                        extNameCache.add("fma");
-                    }
-                    if (lcString.matches(".*\\bsse4_1\\b.*")) {
-                        extNameCache.add("sse4_1");
-                    }
-                    if (lcString.matches(".*\\bsse4_2\\b.*")) {
-                        extNameCache.add("sse4_2");
-                    }
-                }
-                /*
-                 * Add an empty string so that the name cache
-                 * is guaranteed to no longer be empty. This ensures
-                 * that getFeatureFlags() is invoked at most once.
-                 */
-                extNameCache.add("");
-            }
-        }
-
-        /**
          * Tests whether the named ISA extensions are all present.
          *
-         * @param names the names of the extensions to test for
+         * @param requiredNames the names of the extensions to test for
          * @return {@code true} if all are present, otherwise {@code false}
          */
-        public static boolean hasExtensions(String... names) {
-            initializeExtNameCache();
+        public static boolean hasExtensions(String... requiredNames) {
+            // Obtain the list of CPU feature strings from OSHI:
+            SystemInfo si = new SystemInfo();
+            HardwareAbstractionLayer hal = si.getHardware();
+            CentralProcessor cpu = hal.getProcessor();
+            List<String> oshiList = cpu.getFeatureFlags();
 
-            for (String name : names) {
-                String lcName = name.toLowerCase(Locale.ROOT);
-                boolean isPresent = extNameCache.contains(lcName);
+            Pattern pattern = Pattern.compile("[a-z][a-z0-9_]*");
+
+            // Convert the list to a collection of feature names:
+            Collection<String> presentFeatures = new TreeSet<>();
+            for (String oshiString : oshiList) {
+                String lcString = oshiString.toLowerCase(Locale.ROOT);
+                Matcher matcher = pattern.matcher(lcString);
+                while (matcher.find()) {
+                    String featureName = matcher.group();
+                    presentFeatures.add(featureName);
+                }
+            }
+
+            // Test for each required extension:
+            for (String extensionName : requiredNames) {
+                String lcName = extensionName.toLowerCase(Locale.ROOT);
+                String pfName = "pf_" + lcName + "_instructions_available";
+                boolean isPresent = presentFeatures.contains(lcName)
+                        || presentFeatures.contains(pfName);
                 if (!isPresent) {
                     return false;
                 }
             }
+
             return true;
         }
     }
