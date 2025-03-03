@@ -91,15 +91,6 @@ public enum NativeVariant {
 
     private final String property;
 
-    /**
-     * named CPU features that were detected by the OSHI library
-     */
-    private static Collection<String> presentFeatures;
-    /**
-     * serialize access to presentFeatures
-     */
-    private static Object synchronizeFeatures = new Object();
-
     NativeVariant(final String property) {
         this.property = property;
     }
@@ -151,6 +142,15 @@ public enum NativeVariant {
      * A namespace class exposing the CPU propositions.
      */
     public static final class Cpu {
+        /**
+         * named CPU features that were detected by the OSHI library
+         */
+        private static Collection<String> presentFeatures;
+        /**
+         * serialize access to presentFeatures
+         */
+        private static Object synchronizeFeatures = new Object();
+
         private Cpu() {
         }
 
