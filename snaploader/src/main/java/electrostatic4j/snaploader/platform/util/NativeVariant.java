@@ -300,6 +300,38 @@ public enum NativeVariant {
 
         /**
          * Tests whether the named ISA extensions are all present.
+         * <p>
+         * Extension names are case-insensitive and might be reported
+         * differently by different operating systems or even by different
+         * versions of the same operating system.<p>
+         * <p>
+         * Examples of extension names:<ul>
+         * <li>"3dnow" for AMD 3D-Now</li>
+         * <li>"avx" for x86 AVX</li>
+         * <li>"avx2" for x86 AVX2</li>
+         * <li>"avx512f" for x86 AVX512F</li>
+         * <li>"bmi1" for x86 bit-manipulation instruction set 1</li>
+         * <li>"f16c" for x86 half-precision floating-point</li>
+         * <li>"fma" for x86 fused multiply-add</li>
+         * <li>"fmac" for Arm floating-point multiply-accumulate</li>
+         * <li>"mmx" for x86 MMX</li>
+         * <li>"neon" for Arm NEON</li>
+         * <li>"sse3" for x86 SSE3</li>
+         * <li>"sse4_1" for x86 SSE4.1</li>
+         * <li>"sse4_2" for x86 SSE4.2</li>
+         * <li>"ssse3" for x86 SSSE3</li>
+         * <li>"v8" for Arm V8</li>
+         * <li>"v8_crc32" for Arm V8 extra CRC32</li>
+         * <li>"v8_crypto" for Arm V8 extra cryptographic</li>
+         * <li>"v81_atomic" for Arm V8.1 atomic</li>
+         * <li>"v82_dp" for Arm V8.2 DP</li>
+         * <li>"v83_jscvt" for Arm v8.3 JSCVT</li>
+         * <li>"v83_lrcpc" for Arm v8.3 LRCPC</li>
+         * </ul></p>
+         * <p>
+         * Wikipedia provides informal descriptions of many ISA extensions.
+         * https://en.wikipedia.org/wiki/Template:Multimedia_extensions offers a
+         * good starting point.
          *
          * @param requiredNames the names of the extensions to test for
          * @return {@code true} if the current platform supports all of the
