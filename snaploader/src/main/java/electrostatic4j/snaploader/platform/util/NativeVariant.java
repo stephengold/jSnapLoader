@@ -303,7 +303,7 @@ public enum NativeVariant {
          * <p>
          * Extension names are case-insensitive and might be reported
          * differently by different operating systems or even by different
-         * versions of the same operating system.<p>
+         * versions of the same operating system.
          * <p>
          * Examples of extension names:<ul>
          * <li>"3dnow" for AMD 3D-Now</li>
@@ -327,7 +327,7 @@ public enum NativeVariant {
          * <li>"v82_dp" for Arm V8.2 DP</li>
          * <li>"v83_jscvt" for Arm v8.3 JSCVT</li>
          * <li>"v83_lrcpc" for Arm v8.3 LRCPC</li>
-         * </ul></p>
+         * </ul>
          * <p>
          * Wikipedia provides informal descriptions of many ISA extensions.
          * https://en.wikipedia.org/wiki/Template:Multimedia_extensions offers a
