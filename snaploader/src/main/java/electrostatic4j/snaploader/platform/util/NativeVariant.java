@@ -91,6 +91,15 @@ public enum NativeVariant {
 
     private final String property;
 
+    /**
+     * named CPU features that were detected by the OSHI library
+     */
+    private static Collection<String> presentFeatures;
+    /**
+     * serialize access to presentFeatures
+     */
+    private static Object synchronizeFeatures = new Object();
+
     NativeVariant(final String property) {
         this.property = property;
     }
@@ -262,12 +271,11 @@ public enum NativeVariant {
         }
 
         /**
-         * Tests whether the named ISA extensions are all present.
-         *
-         * @param requiredNames the names of the extensions to test for
-         * @return {@code true} if all are present, otherwise {@code false}
+         * Reads named CPU features from the OSHI library and parses them into
+         * words. If system commands are executed, this might be an expensive
+         * operation.
          */
-        public static boolean hasExtensions(String... requiredNames) {
+        private static Collection<String> readFeatureFlags() {
             // Obtain the list of CPU feature strings from OSHI:
             SystemInfo si = new SystemInfo();
             HardwareAbstractionLayer hal = si.getHardware();
@@ -277,24 +285,53 @@ public enum NativeVariant {
             Pattern pattern = Pattern.compile("[a-z][a-z0-9_]*");
 
             // Convert the list to a collection of feature names:
-            Collection<String> presentFeatures = new TreeSet<>();
+            Collection<String> result = new TreeSet<>();
             for (String oshiString : oshiList) {
                 String lcString = oshiString.toLowerCase(Locale.ROOT);
                 Matcher matcher = pattern.matcher(lcString);
                 while (matcher.find()) {
                     String featureName = matcher.group();
-                    presentFeatures.add(featureName);
+                    result.add(featureName);
                 }
             }
 
-            // Test for each required extension:
-            for (String extensionName : requiredNames) {
-                String lcName = extensionName.toLowerCase(Locale.ROOT);
-                String pfName = "pf_" + lcName + "_instructions_available";
-                boolean isPresent = presentFeatures.contains(lcName)
-                        || presentFeatures.contains(pfName);
-                if (!isPresent) {
-                    return false;
+            return result;
+        }
+
+        /**
+         * Tests whether the named ISA extensions are all present.
+         *
+         * @param requiredNames the names of the extensions to test for
+         * @return {@code true} if the current platform supports all of the
+         * specified extensions, otherwise {@code false}
+         */
+        public static boolean hasExtensions(String... requiredNames) {
+            synchronized (synchronizeFeatures) {
+                if (presentFeatures == null) {
+                    presentFeatures = readFeatureFlags();
+                }
+
+                // Test for each required extension:
+                for (String extensionName : requiredNames) {
+                    String lcName = extensionName.toLowerCase(Locale.ROOT);
+                    /*
+                     * On Windows, ISA extensions are coded as features
+                     * with names like "PF_xxx_INSTRUCTIONS_AVAILABLE" and
+                     * "PF_ARM_xxx_INSTRUCTIONS_AVAILABLE".
+                     *
+                     * For details see
+                     * https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-isprocessorfeaturepresent
+                     */
+                    String pfNameArm = "pf_arm_" + lcName + "_instructions_available";
+                    String pfNameX86 = "pf_" + lcName + "_instructions_available";
+                    boolean isPresent = presentFeatures.contains(lcName)
+                            || presentFeatures.contains(pfNameX86)
+                            || presentFeatures.contains(pfNameArm);
+
+                    // conjunctive test: fails if any required extension is missing
+                    if (!isPresent) {
+                        return false;
+                    }
                 }
             }
 
