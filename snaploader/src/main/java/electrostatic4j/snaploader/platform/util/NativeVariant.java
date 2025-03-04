@@ -287,6 +287,13 @@ public enum NativeVariant {
             // Convert the list to a collection of feature names:
             Collection<String> result = new TreeSet<>();
             for (String oshiString : oshiList) {
+                /*
+                 * On macOS, strings ending with ": 0" indicate
+                 * disabled features, so ignore all such lines.
+                 */
+                if (oshiString.endsWith(": 0")) {
+                    continue;
+                }
                 String lcString = oshiString.toLowerCase(Locale.ROOT);
                 Matcher matcher = pattern.matcher(lcString);
                 while (matcher.find()) {
