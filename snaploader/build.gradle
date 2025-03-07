@@ -27,5 +27,5 @@ jar { // assemble jar options [java -jar]
 }
 
 dependencies {
-    implementation('com.github.oshi:oshi-core:6.7.0')
+    api('com.github.oshi:oshi-core:6.7.0')
 }
