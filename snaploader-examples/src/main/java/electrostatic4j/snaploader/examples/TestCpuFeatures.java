@@ -84,7 +84,7 @@ public final class TestCpuFeatures {
         loader.setLoggingEnabled(true);
         loader.setRetryWithCleanExtraction(true);
         try {
-            loader.loadLibrary(LoadingCriterion.INCREMENTAL_LOADING);
+            loader.loadLibrary(LoadingCriterion.CLEAN_EXTRACTION);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to load the joltjni library!");
         }
