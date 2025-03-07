@@ -86,4 +86,11 @@ task createJar(type : Jar, dependsOn : copyLibs){
 
 dependencies {
     implementation project(path: ':snaploader')
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3'
+
+    implementation 'com.github.stephengold:jolt-jni-Linux64:0.9.7'
+    runtimeOnly 'com.github.stephengold:jolt-jni-Linux64:0.9.7:DebugSp'
+    runtimeOnly 'com.github.stephengold:jolt-jni-Linux64_fma:0.9.7:DebugSp'
+    runtimeOnly 'com.github.stephengold:jolt-jni-Windows64:0.9.7:DebugSp'
+    runtimeOnly 'com.github.stephengold:jolt-jni-Windows64_avx2:0.9.7:DebugSp'
 }
