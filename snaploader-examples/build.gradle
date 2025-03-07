@@ -26,6 +26,12 @@ tasks.register("TestBasicFeatures2") {
     application.mainClass = 'electrostatic4j.snaploader.examples.TestBasicFeatures2'
 }
 
+tasks.register("TestCpuFeatures", JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    description = 'Runs the TestCpuFeatures example app.'
+    mainClass = 'electrostatic4j.snaploader.examples.TestCpuFeatures'
+}
+
 tasks.register("MonitorableExample") {
     application.mainClass = 'electrostatic4j.snaploader.examples.MonitorableExample'
 }
