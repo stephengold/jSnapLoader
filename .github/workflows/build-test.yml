@@ -101,5 +101,8 @@ jobs:
           - name: Run TestZipExtractor
             run: ./gradlew :snaploader-examples:TestZipExtractor :snaploader-examples:run
 
+          - name: Run TestCpuFeatures
+            run: ./gradlew :snaploader-examples:TestCpuFeatures :snaploader-examples:run
+
           - name: List extracted files
             run: ls ./snaploader-examples/libs/
