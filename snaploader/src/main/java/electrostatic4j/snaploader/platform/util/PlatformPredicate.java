@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
+ * Copyright (c) 2023-2025, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -132,6 +132,19 @@ public final class PlatformPredicate {
      */
     public PlatformPredicate(boolean predicate) {
         this.predicate = predicate;
+    }
+
+    /**
+     * Instantiates a predicate object that combines a pre-existing predicate
+     * with one or more instruction-set extensions.  The result is true if and
+     * only if the base predicate is true and all named extensions are present.
+     *
+     * @param base a pre-existing predicate (not null)
+     * @param isaExtensions names of required ISA extensions
+     */
+    public PlatformPredicate(PlatformPredicate base, String... isaExtensions) {
+        this.predicate = base.evaluatePredicate()
+                && NativeVariant.Cpu.hasExtensions(isaExtensions);
     }
 
     /**

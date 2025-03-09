@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
+ * Copyright (c) 2023-2025, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,16 @@
  */
 
 package electrostatic4j.snaploader.platform.util;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.HardwareAbstractionLayer;
 
 /**
  * Wraps objects for native variant constituents (OS + ARCH={CPU + INSTRUCT_SET} + VM).
@@ -132,6 +142,15 @@ public enum NativeVariant {
      * A namespace class exposing the CPU propositions.
      */
     public static final class Cpu {
+        /**
+         * named CPU features that were detected by the OSHI library
+         */
+        private static Collection<String> presentFeatures;
+        /**
+         * serialize access to presentFeatures
+         */
+        private static Object synchronizeFeatures = new Object();
+
         private Cpu() {
         }
 
@@ -249,6 +268,113 @@ public enum NativeVariant {
          */
         public static boolean isARM() {
             return OS_ARCH.getProperty().contains("arm") || OS_ARCH.getProperty().contains("aarch");
+        }
+
+        /**
+         * Reads named CPU features from the OSHI library and parses them into
+         * words. If system commands are executed, this might be an expensive
+         * operation.
+         */
+        private static Collection<String> readFeatureFlags() {
+            // Obtain the list of CPU feature strings from OSHI:
+            SystemInfo si = new SystemInfo();
+            HardwareAbstractionLayer hal = si.getHardware();
+            CentralProcessor cpu = hal.getProcessor();
+            List<String> oshiList = cpu.getFeatureFlags();
+
+            Pattern pattern = Pattern.compile("[a-z][a-z0-9_]*");
+
+            // Convert the list to a collection of feature names:
+            Collection<String> result = new TreeSet<>();
+            for (String oshiString : oshiList) {
+                /*
+                 * On macOS, strings ending with ": 0" indicate
+                 * disabled features, so ignore all such lines.
+                 */
+                if (oshiString.endsWith(": 0")) {
+                    continue;
+                }
+                String lcString = oshiString.toLowerCase(Locale.ROOT);
+                Matcher matcher = pattern.matcher(lcString);
+                while (matcher.find()) {
+                    String featureName = matcher.group();
+                    result.add(featureName);
+                }
+            }
+
+            return result;
+        }
+
+        /**
+         * Tests whether the named ISA extensions are all present.
+         * <p>
+         * Extension names are case-insensitive and might be reported
+         * differently by different operating systems or even by different
+         * versions of the same operating system.
+         * <p>
+         * Examples of extension names:<ul>
+         * <li>"3dnow" for AMD 3D-Now</li>
+         * <li>"avx" for x86 AVX</li>
+         * <li>"avx2" for x86 AVX2</li>
+         * <li>"avx512f" for x86 AVX512F</li>
+         * <li>"bmi1" for x86 bit-manipulation instruction set 1</li>
+         * <li>"f16c" for x86 half-precision floating-point</li>
+         * <li>"fma" for x86 fused multiply-add</li>
+         * <li>"fmac" for Arm floating-point multiply-accumulate</li>
+         * <li>"mmx" for x86 MMX</li>
+         * <li>"neon" for Arm NEON</li>
+         * <li>"sse3" for x86 SSE3</li>
+         * <li>"sse4_1" for x86 SSE4.1</li>
+         * <li>"sse4_2" for x86 SSE4.2</li>
+         * <li>"ssse3" for x86 SSSE3</li>
+         * <li>"v8" for Arm V8</li>
+         * <li>"v8_crc32" for Arm V8 extra CRC32</li>
+         * <li>"v8_crypto" for Arm V8 extra cryptographic</li>
+         * <li>"v81_atomic" for Arm V8.1 atomic</li>
+         * <li>"v82_dp" for Arm V8.2 DP</li>
+         * <li>"v83_jscvt" for Arm v8.3 JSCVT</li>
+         * <li>"v83_lrcpc" for Arm v8.3 LRCPC</li>
+         * </ul>
+         * <p>
+         * Wikipedia provides informal descriptions of many ISA extensions.
+         * https://en.wikipedia.org/wiki/Template:Multimedia_extensions offers a
+         * good starting point.
+         *
+         * @param requiredNames the names of the extensions to test for
+         * @return {@code true} if the current platform supports all of the
+         * specified extensions, otherwise {@code false}
+         */
+        public static boolean hasExtensions(String... requiredNames) {
+            synchronized (synchronizeFeatures) {
+                if (presentFeatures == null) {
+                    presentFeatures = readFeatureFlags();
+                }
+
+                // Test for each required extension:
+                for (String extensionName : requiredNames) {
+                    String lcName = extensionName.toLowerCase(Locale.ROOT);
+                    /*
+                     * On Windows, ISA extensions are coded as features
+                     * with names like "PF_xxx_INSTRUCTIONS_AVAILABLE" and
+                     * "PF_ARM_xxx_INSTRUCTIONS_AVAILABLE".
+                     *
+                     * For details see
+                     * https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-isprocessorfeaturepresent
+                     */
+                    String pfNameArm = "pf_arm_" + lcName + "_instructions_available";
+                    String pfNameX86 = "pf_" + lcName + "_instructions_available";
+                    boolean isPresent = presentFeatures.contains(lcName)
+                            || presentFeatures.contains(pfNameX86)
+                            || presentFeatures.contains(pfNameArm);
+
+                    // conjunctive test: fails if any required extension is missing
+                    if (!isPresent) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 
