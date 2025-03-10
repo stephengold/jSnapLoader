@@ -249,6 +249,8 @@ public class NativeBinaryLoader {
      * 
      * @param library the platform-specific library to load
      * @throws IOException in case the binary to be extracted is not found on the specified jar
+     * @throws LoadingRetryExhaustionException if the number of loading failure exceeds the specified
+     *                                         number.
      */
     protected void loadBinary(NativeDynamicLibrary library) throws Exception {
         try {
