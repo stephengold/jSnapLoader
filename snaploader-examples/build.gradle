@@ -52,6 +52,10 @@ tasks.register("TestMultiThreading") {
     application.mainClass = 'electrostatic4j.snaploader.examples.TestMultiThreading'
 }
 
+tasks.register("TestRetryExhaustionException") {
+    application.mainClass = 'electrostatic4j.snaploader.examples.TestRetryExhaustionException'
+}
+
 task copyLibs(type: Copy) {
     from (libsDir) {
         include '**/*.jar'

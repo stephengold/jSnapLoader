@@ -4,12 +4,12 @@ plugins {
 }
 
 tasks.register("generateJavadocJar", Jar) {
-    classifier = 'javadoc'
+    archiveClassifier.set("javadoc")
     from javadoc
 }
 
 tasks.register("generateSourcesJar", Jar) {
-    classifier = 'sources'
+    archiveClassifier.set("sources")
     from sourceSets.main.allSource
 }
 

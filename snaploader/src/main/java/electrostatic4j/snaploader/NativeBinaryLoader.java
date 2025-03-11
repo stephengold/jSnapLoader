@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
+ * Copyright (c) 2023-2025, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,7 @@ import electrostatic4j.snaploader.library.LibraryExtractor;
 import electrostatic4j.snaploader.library.LibraryLocator;
 import electrostatic4j.snaploader.platform.NativeDynamicLibrary;
 import electrostatic4j.snaploader.platform.util.NativeVariant;
+import electrostatic4j.snaploader.throwable.LoadingRetryExhaustionException;
 import electrostatic4j.snaploader.throwable.UnSupportedSystemError;
 import electrostatic4j.snaploader.util.SnapLoaderLogger;
 
@@ -83,6 +84,10 @@ public class NativeBinaryLoader {
      * Flag for retry loading with clean extract if UnSatisfiedLinkError is thrown.
      */
     protected boolean retryWithCleanExtraction;
+
+    protected int maxNumberOfLoadingFailure = 2;
+
+    protected int numberOfLoadingFailure = 0;
 
     /**
      * Instantiates a native dynamic library loader to extract and load a system-specific native dynamic library.
@@ -234,12 +239,18 @@ public class NativeBinaryLoader {
         return libraryLocalizingListener;
     }
 
+    public void setMaxNumberOfLoadingFailure(int maxNumberOfLoadingFailure) {
+        this.maxNumberOfLoadingFailure = Math.abs(maxNumberOfLoadingFailure);
+    }
+
     /**
      * Loads a native binary using the platform-dependent object, for Android;
      * the library is loaded by its basename (variant is managed internally by the android sdk).
      * 
      * @param library the platform-specific library to load
      * @throws IOException in case the binary to be extracted is not found on the specified jar
+     * @throws LoadingRetryExhaustionException if the number of loading failure exceeds the specified
+     *                                         number.
      */
     protected void loadBinary(NativeDynamicLibrary library) throws Exception {
         try {
@@ -264,10 +275,17 @@ public class NativeBinaryLoader {
             }
             /* Retry with clean extract */
             if (isRetryWithCleanExtraction()) {
-                cleanExtractBinary(library);
                 if (nativeBinaryLoadingListener != null) {
                     nativeBinaryLoadingListener.onRetryCriterionExecution(this);
                 }
+                // limit the number of retries to maxNumberOfLoadingFailure
+                if (numberOfLoadingFailure >= maxNumberOfLoadingFailure) {
+                    numberOfLoadingFailure = 0; /* reset the number to zero trials */
+                    throw new LoadingRetryExhaustionException("Library loading retries exceeded the maximum!");
+                }
+                ++numberOfLoadingFailure;
+                // Jump call -> Possible Recursive Call
+                cleanExtractBinary(library);
             }
         }
     }
@@ -281,7 +299,7 @@ public class NativeBinaryLoader {
      */
     protected void cleanExtractBinary(NativeDynamicLibrary library) throws Exception {
         libraryExtractor = initializeLibraryExtractor(library);
-       SnapLoaderLogger.log(Level.INFO, getClass().getName(), "cleanExtractBinary",
+        SnapLoaderLogger.log(Level.INFO, getClass().getName(), "cleanExtractBinary",
                "File extractor handler initialized!");
         /* CLEAR RESOURCES AND RESET OBJECTS ON-EXTRACTION */
         libraryExtractor.setExtractionListener(new FileExtractionListener() {
