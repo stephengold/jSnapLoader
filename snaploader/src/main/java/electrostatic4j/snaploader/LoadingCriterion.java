@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
+ * Copyright (c) 2023-2025, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,5 +47,88 @@ public enum LoadingCriterion {
     /**
      * Extracts the native binary only if the current binary isn't present on the extraction directory.
      */
-    INCREMENTAL_LOADING;
+    INCREMENTAL_LOADING,
+
+    /**
+     * Commands to load a native dynamic library from the system directories.
+     * <p>
+     * This criterion instructs the loader to search for the native library in predefined
+     * system locations, relying on the operating system's dynamic linker to resolve the library.
+     * The library must be pre-installed and accessible through standard system paths.
+     * </p>
+     *
+     * <b>System Library Search Paths</b>
+     * <p>The specific directories searched depend on the operating system:</p>
+     * <ul>
+     *   <li><b>Linux:</b> Searches in:
+     *     <ul>
+     *       <li>Directories specified in {@code LD_LIBRARY_PATH}.</li>
+     *       <li>System-wide library directories:
+     *         <ul>
+     *           <li>{@code /lib}</li>
+     *           <li>{@code /usr/lib}</li>
+     *           <li>{@code /usr/local/lib}</li>
+     *           <li>Paths configured in {@code /etc/ld.so.conf} and {@code /etc/ld.so.conf.d/}.</li>
+     *         </ul>
+     *       </li>
+     *     </ul>
+     *   </li>
+     *   <li><b>Windows:</b> Searches in:
+     *     <ul>
+     *       <li>Directories listed in the {@code PATH} environment variable.</li>
+     *       <li>System directories:
+     *         <ul>
+     *           <li>{@code C:\Windows\System32} (for 64-bit DLLs)</li>
+     *           <li>{@code C:\Windows\SysWOW64} (for 32-bit DLLs on 64-bit Windows)</li>
+     *           <li>Current working directory of the running process.</li>
+     *         </ul>
+     *       </li>
+     *     </ul>
+     *   </li>
+     *   <li><b>macOS:</b> Searches in:
+     *     <ul>
+     *       <li>Directories specified in {@code DYLD_LIBRARY_PATH}.</li>
+     *       <li>System library locations:
+     *         <ul>
+     *           <li>{@code /usr/lib}</li>
+     *           <li>{@code /usr/local/lib}</li>
+     *           <li>{@code /System/Library/Frameworks/} (for framework-based libraries).</li>
+     *         </ul>
+     *       </li>
+     *     </ul>
+     *   </li>
+     *   <li><b>Android:</b> Searches in:
+     *     <ul>
+     *       <li>Application-specific native library directories:
+     *         <ul>
+     *           <li>{@code /data/data/<package>/lib}</li>
+     *           <li>Native library folders inside the APK:
+     *             <ul>
+     *               <li>{@code /lib/armeabi-v7a/}</li>
+     *               <li>{@code /lib/arm64-v8a/}</li>
+     *               <li>{@code /lib/x86/}</li>
+     *               <li>{@code /lib/x86_64/}</li>
+     *             </ul>
+     *           </li>
+     *         </ul>
+     *       </li>
+     *       <li>System native library locations:
+     *         <ul>
+     *           <li>{@code /system/lib} (for 32-bit libraries).</li>
+     *           <li>{@code /system/lib64} (for 64-bit libraries).</li>
+     *         </ul>
+     *       </li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     *
+     * <b>Usage Considerations</b>
+     * <p>
+     * This approach requires the library to be present on the system beforehand.
+     * If the library is missing, the loading process will fail with an {@code UnsatisfiedLinkError}.
+     * To ensure compatibility across different systems, consider providing a fallback
+     * mechanism to extract the library dynamically when needed via {@link NativeBinaryLoadingListener#onLoadingFailure(NativeBinaryLoader)}.
+     * </p>
+     */
+    SYSTEM_LOAD
 }

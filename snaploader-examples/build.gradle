@@ -103,4 +103,5 @@ dependencies {
     runtimeOnly 'com.github.stephengold:jolt-jni-Linux64_fma:0.9.7:DebugSp'
     runtimeOnly 'com.github.stephengold:jolt-jni-Windows64:0.9.7:DebugSp'
     runtimeOnly 'com.github.stephengold:jolt-jni-Windows64_avx2:0.9.7:DebugSp'
+    runtimeOnly 'io.github.software-hardware-codesign:jme3-alloc-desktop:1.0.0-pre-gamma-2'
 }

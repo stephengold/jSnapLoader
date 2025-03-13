@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
+ * Copyright (c) 2023-2025, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ package electrostatic4j.snaploader;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import electrostatic4j.snaploader.platform.NativeDynamicLibrary;
+import electrostatic4j.snaploader.throwable.UnSupportedSystemError;
 
 /**
  * A thread-safe implementation for the NativeBinaryLoader.
@@ -56,7 +57,31 @@ public class ConcurrentNativeBinaryLoader extends NativeBinaryLoader {
     public ConcurrentNativeBinaryLoader(final List<NativeDynamicLibrary> registeredLibraries, final LibraryInfo libraryInfo) {
         super(registeredLibraries, libraryInfo);
     }
-    
+
+    @Override
+    public NativeBinaryLoader initPlatformLibrary() throws UnSupportedSystemError {
+        try {
+            /* CRITICAL SECTION STARTS */
+            lock.lock();
+            return super.initPlatformLibrary();
+        } finally {
+            lock.unlock();
+            /* CRITICAL SECTION ENDS */
+        }
+    }
+
+    @Override
+    public NativeBinaryLoader loadLibrary(LoadingCriterion criterion) throws Exception {
+        try {
+            /* CRITICAL SECTION STARTS */
+            lock.lock();
+            return super.loadLibrary(criterion);
+        } finally {
+            lock.unlock();
+            /* CRITICAL SECTION ENDS */
+        }
+    }
+
     @Override
     protected void cleanExtractBinary(NativeDynamicLibrary library) throws Exception {
         try {
