@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
+ * Copyright (c) 2023-2025, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,12 @@ import electrostatic4j.snaploader.platform.NativeDynamicLibrary;
  * @author pavl_g
  */
 public class DefaultDynamicLibraries {
+
+    /**
+     * Represents a System Directory Android Library.
+     */
+    public static NativeDynamicLibrary ANDROID_ALL =
+            new NativeDynamicLibrary("", PlatformPredicate.ANDROID);
 
     /**
      * Represents a linux x86 binary with 64-bit instruction set.
