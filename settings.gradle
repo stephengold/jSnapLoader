@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = 'jSnapLoader'
 include('snaploader')
 include('snaploader-examples')
+include(':android-application')
