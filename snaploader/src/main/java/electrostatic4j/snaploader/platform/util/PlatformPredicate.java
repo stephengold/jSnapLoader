@@ -42,24 +42,34 @@ package electrostatic4j.snaploader.platform.util;
 public final class PlatformPredicate {
 
     /**
-     * Alias object for Linux on X86 Chipset.
+     * Alias object for Linux on X86 Desktop Chipset.
      */
-    public static final PlatformPredicate LINUX_X86 = new PlatformPredicate(NativeVariant.Os.isLinux() && NativeVariant.Cpu.isX86());
+    public static final PlatformPredicate LINUX_X86 = new PlatformPredicate(NativeVariant.Os.isDesktop() &&
+            NativeVariant.Os.isLinux() && NativeVariant.Cpu.isX86());
 
     /**
-     * Alias object for Linux on X86-64 Chipset.
+     * Alias object for Android all variants (i.e., x86, AARCH64, ARM32)
+     * when using {@link Runtime#loadLibrary(String)}.
      */
-    public static final PlatformPredicate LINUX_X86_64 = new PlatformPredicate(NativeVariant.Os.isLinux() && NativeVariant.Cpu.isAMD() && NativeVariant.Cpu.is64());
+    public static final PlatformPredicate ANDROID = new PlatformPredicate(NativeVariant.Os.isAndroid());
 
     /**
-     * Alias object for Linux on arm-32 Chipset.
+     * Alias object for Linux on X86-64 Desktop Chipset.
      */
-    public static final PlatformPredicate LINUX_ARM_32 = new PlatformPredicate(NativeVariant.Os.isLinux() && NativeVariant.Cpu.isARM());
+    public static final PlatformPredicate LINUX_X86_64 = new PlatformPredicate(NativeVariant.Os.isDesktop() &&
+            NativeVariant.Os.isLinux() && NativeVariant.Cpu.isAMD() && NativeVariant.Cpu.is64());
 
     /**
-     * Alias object for Linux on arm-64 Chipset.
+     * Alias object for Linux on arm-32 Desktop Chipset.
      */
-    public static final PlatformPredicate LINUX_ARM_64 = new PlatformPredicate(NativeVariant.Os.isLinux() && NativeVariant.Cpu.isARM() && NativeVariant.Cpu.is64());
+    public static final PlatformPredicate LINUX_ARM_32 = new PlatformPredicate(NativeVariant.Os.isDesktop() &&
+            NativeVariant.Os.isLinux() && NativeVariant.Cpu.isARM());
+
+    /**
+     * Alias object for Linux on arm-64 Desktop Chipset.
+     */
+    public static final PlatformPredicate LINUX_ARM_64 = new PlatformPredicate(NativeVariant.Os.isDesktop() &&
+            NativeVariant.Os.isLinux() && NativeVariant.Cpu.isARM() && NativeVariant.Cpu.is64());
 
     /**
      * Alias object for Linux on RiscV-32 Chipset.
@@ -139,7 +149,7 @@ public final class PlatformPredicate {
      * with one or more instruction-set extensions.  The result is true if and
      * only if the base predicate is true and all named extensions are present.
      *
-     * @param base a pre-existing predicate (not null)
+     * @param base          a pre-existing predicate (not null)
      * @param isaExtensions names of required ISA extensions
      */
     public PlatformPredicate(PlatformPredicate base, String... isaExtensions) {
