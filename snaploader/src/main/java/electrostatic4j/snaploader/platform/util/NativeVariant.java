@@ -87,6 +87,7 @@ public enum NativeVariant {
     private static final String Linux = "Linux";
     private static final String Windows = "Windows";
     private static final String Mac = "Mac";
+    private static final String WebOs = "WebOs";
     private static final String Dalvik = "Dalvik";
 
     private final String property;
@@ -135,6 +136,37 @@ public enum NativeVariant {
          */
         public static boolean isAndroid() {
             return JVM.getProperty().contains(NativeVariant.Dalvik);
+        }
+
+        /**
+         * Tests whether the current system runtime is Desktop. A
+         * system runtime is said to be desktop if it's not an Android,
+         * and not Web-OS, and not iOS.
+         *
+         * @return true if the current runtime is a desktop binary, false otherwise.
+         */
+        public static boolean isDesktop() {
+            return !isAndroid() && !isWebOs() && !isIos();
+        }
+
+        /**
+         * Contemplated to test whether the current system runtime is
+         * a web os.
+         *
+         * @return true if web-os; false otherwise. Current value is constantly false.
+         */
+        public static boolean isWebOs() {
+            return false;
+        }
+
+        /**
+         * Contemplated to test whether the current system runtime is
+         * an iOS os.
+         *
+         * @return true if iOS; false otherwise. Current value is constantly false.
+         */
+        public static boolean isIos() {
+            return false;
         }
     }
 
