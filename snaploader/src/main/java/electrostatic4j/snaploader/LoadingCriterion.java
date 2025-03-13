@@ -57,7 +57,7 @@ public enum LoadingCriterion {
      * The library must be pre-installed and accessible through standard system paths.
      * </p>
      *
-     * <h3>System Library Search Paths</h3>
+     * <b>System Library Search Paths</b>
      * <p>The specific directories searched depend on the operating system:</p>
      * <ul>
      *   <li><b>Linux:</b> Searches in:
@@ -122,7 +122,7 @@ public enum LoadingCriterion {
      *   </li>
      * </ul>
      *
-     * <h3>Usage Considerations</h3>
+     * <b>Usage Considerations</b>
      * <p>
      * This approach requires the library to be present on the system beforehand.
      * If the library is missing, the loading process will fail with an {@code UnsatisfiedLinkError}.
