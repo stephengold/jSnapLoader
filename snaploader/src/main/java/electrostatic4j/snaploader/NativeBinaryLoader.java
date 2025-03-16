@@ -47,6 +47,7 @@ import electrostatic4j.snaploader.platform.NativeDynamicLibrary;
 import electrostatic4j.snaploader.platform.util.NativeVariant;
 import electrostatic4j.snaploader.throwable.LoadingRetryExhaustionException;
 import electrostatic4j.snaploader.throwable.UnSupportedSystemError;
+import electrostatic4j.snaploader.util.CallingStackMetaData;
 import electrostatic4j.snaploader.util.SnapLoaderLogger;
 
 /**
@@ -160,7 +161,7 @@ public class NativeBinaryLoader {
      * </p>
      *
      * <p>
-     * Fallback loading routines can be implemented as needed via {@link NativeBinaryLoadingListener#onLoadingFailure(NativeBinaryLoader)}
+     * Fallback loading routines can be implemented as needed via {@link NativeBinaryLoadingListener#onLoadingFailure(NativeBinaryLoader, CallingStackMetaData)}
      * and are left for the user applications.
      * </p>
      *
@@ -179,7 +180,7 @@ public class NativeBinaryLoader {
             return this;
         }
         if (criterion == LoadingCriterion.INCREMENTAL_LOADING && nativeDynamicLibrary.isExtracted()) {
-            loadBinary(nativeDynamicLibrary);
+            loadBinary(nativeDynamicLibrary, criterion);
             return this;
         }
         cleanExtractBinary(nativeDynamicLibrary);
@@ -272,14 +273,16 @@ public class NativeBinaryLoader {
             SnapLoaderLogger.log(Level.INFO, getClass().getName(), "loadSystemBinary", "Successfully loaded library from the system: "
                     + libraryInfo.getBaseName());
             if (nativeBinaryLoadingListener != null) {
-                nativeBinaryLoadingListener.onLoadingSuccess(this);
+                nativeBinaryLoadingListener.onLoadingSuccess(this,
+                        new CallingStackMetaData(Thread.currentThread().getStackTrace()[1], LoadingCriterion.SYSTEM_LOAD));
             }
         } catch (UnsatisfiedLinkError e) {
             SnapLoaderLogger.log(Level.SEVERE, getClass().getName(), "loadSystemBinary", "Cannot load the dynamic library from the system: "
                     + libraryInfo.getBaseName(), e);
             // fire failure routine for fallback criteria
             if (nativeBinaryLoadingListener != null) {
-                nativeBinaryLoadingListener.onLoadingFailure(this);
+                nativeBinaryLoadingListener.onLoadingFailure(this,
+                        new CallingStackMetaData(Thread.currentThread().getStackTrace()[1], LoadingCriterion.SYSTEM_LOAD, e));
             }
         }
     }
@@ -289,28 +292,32 @@ public class NativeBinaryLoader {
      * native library data structure defining the directory path.
      *
      * @param library the platform-specific library to load
+     * @param loadingCriterion pass the loading criterion condition to the calling stack metadata structure
      * @throws IOException                     in case the binary to be extracted is not found on the specified jar
      * @throws LoadingRetryExhaustionException if the number of loading failure exceeds the specified
      *                                         number.
      */
-    protected void loadBinary(NativeDynamicLibrary library) throws Exception {
+    protected void loadBinary(NativeDynamicLibrary library, LoadingCriterion loadingCriterion) throws Exception {
         try {
             System.load(library.getExtractedLibrary());
             SnapLoaderLogger.log(Level.INFO, getClass().getName(), "loadBinary", "Successfully loaded library: "
                     + library.getExtractedLibrary());
             if (nativeBinaryLoadingListener != null) {
-                nativeBinaryLoadingListener.onLoadingSuccess(this);
+                nativeBinaryLoadingListener.onLoadingSuccess(this,
+                        new CallingStackMetaData(Thread.currentThread().getStackTrace()[1], loadingCriterion));
             }
         } catch (final UnsatisfiedLinkError error) {
             SnapLoaderLogger.log(Level.SEVERE, getClass().getName(), "loadBinary", "Cannot load the dynamic library: "
                     + library.getExtractedLibrary(), error);
             if (nativeBinaryLoadingListener != null) {
-                nativeBinaryLoadingListener.onLoadingFailure(this);
+                nativeBinaryLoadingListener.onLoadingFailure(this,
+                        new CallingStackMetaData(Thread.currentThread().getStackTrace()[1], loadingCriterion, error));
             }
             /* Retry with clean extract */
             if (isRetryWithCleanExtraction()) {
                 if (nativeBinaryLoadingListener != null) {
-                    nativeBinaryLoadingListener.onRetryCriterionExecution(this);
+                    nativeBinaryLoadingListener.onRetryCriterionExecution(this,
+                            new CallingStackMetaData(Thread.currentThread().getStackTrace()[1], loadingCriterion));
                 }
                 // limit the number of retries to maxNumberOfLoadingFailure
                 if (numberOfLoadingFailure >= maxNumberOfLoadingFailure) {
@@ -347,7 +354,7 @@ public class NativeBinaryLoader {
                     SnapLoaderLogger.log(Level.INFO, getClass().getName(), "cleanExtractBinary",
                             "Extracted successfully to " + library.getExtractedLibrary());
                     // load the native binary
-                    loadBinary(library);
+                    loadBinary(library, LoadingCriterion.CLEAN_EXTRACTION);
                 } catch (Exception e) {
                     SnapLoaderLogger.log(Level.SEVERE, getClass().getName(), "cleanExtractBinary",
                             "Error while loading the binary!", e);
@@ -441,6 +448,14 @@ public class NativeBinaryLoader {
                 // bind the library locator lifecycle to the user application
                 if (libraryLocalizingListener != null) {
                     libraryLocalizingListener.onFileLocalizationFailure(locator, throwable);
+                }
+
+                // make use of the loader listeners
+                if (nativeBinaryLoadingListener != null) {
+                    // a file locator and extractor loader is always a CLEAN_EXTRACTION regarding
+                    // the loading criterion
+                    nativeBinaryLoadingListener.onLoadingFailure(NativeBinaryLoader.this,
+                            new CallingStackMetaData(Thread.currentThread().getStackTrace()[1], LoadingCriterion.CLEAN_EXTRACTION, throwable));
                 }
             }
         });
