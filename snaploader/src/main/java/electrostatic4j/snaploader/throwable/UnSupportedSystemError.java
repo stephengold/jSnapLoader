@@ -33,13 +33,13 @@
 package electrostatic4j.snaploader.throwable;
 
 /**
- * A business error of type {@link UnsatisfiedLinkError} to indicate an unsupported system.
+ * A business error of type {@link Error} to indicate an unsupported system.
  * <p>
  * This error is thrown when all the user-defined platform predicates are not met!
  *
  * @author pavl_g
  */
-public class UnSupportedSystemError extends UnsatisfiedLinkError {
+public class UnSupportedSystemError extends Error {
     
     /**
      * Thrown if the system detects an unsupported system binaries of the current OS.
