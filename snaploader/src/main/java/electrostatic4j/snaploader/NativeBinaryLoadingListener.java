@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
+ * Copyright (c) 2023-2025, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,13 +33,14 @@
 package electrostatic4j.snaploader;
 
 import electrostatic4j.snaploader.platform.NativeDynamicLibrary;
+import electrostatic4j.snaploader.util.CallingStackMetaData;
 
 /**
  * Provides executable functions binding the user applications to
  * the loading lifecycle.
  * <p>
  * Note: All the functions on this interface are dispatched
- * by the {@link NativeBinaryLoader#loadBinary(NativeDynamicLibrary)}.
+ * by the {@link NativeBinaryLoader#loadBinary(NativeDynamicLibrary, LoadingCriterion)}
  *
  * @author pavl_g
  */
@@ -48,16 +49,19 @@ public interface NativeBinaryLoadingListener {
     /**
      * Dispatched when loading the system-specific binary has succeeded.
      *
-     * @param nativeBinaryLoader the dispatching loader
+     * @param nativeBinaryLoader the dispatching loader.
+     * @param callingStackMetaData a data structure representing the meta data of the calling stack.
      */
-    void onLoadingSuccess(NativeBinaryLoader nativeBinaryLoader);
+    void onLoadingSuccess(NativeBinaryLoader nativeBinaryLoader, CallingStackMetaData callingStackMetaData);
 
     /**
      * Dispatched when loading the system-specific binary has failed.
      *
-     * @param nativeBinaryLoader the dispatching loader
+     * @param nativeBinaryLoader the dispatching loader.
+     * @param callingStackMetaData a data structure representing the meta data of the calling stack.
      */
-    void onLoadingFailure(NativeBinaryLoader nativeBinaryLoader);
+    void onLoadingFailure(NativeBinaryLoader nativeBinaryLoader,
+                          CallingStackMetaData callingStackMetaData);
 
     /**
      * Dispatched when loading the system-specific binary has failed,
@@ -66,7 +70,8 @@ public interface NativeBinaryLoadingListener {
      * Note: this dispatching function could be overridden to add
      * your own anti-failure mechanisms (i.e., Retry Criterion).
      *
-     * @param nativeBinaryLoader the dispatching loader
+     * @param nativeBinaryLoader the dispatching loader.
+     * @param callingStackMetaData a data structure representing the meta data of the calling stack.
      */
-    void onRetryCriterionExecution(NativeBinaryLoader nativeBinaryLoader);
+    void onRetryCriterionExecution(NativeBinaryLoader nativeBinaryLoader, CallingStackMetaData callingStackMetaData);
 }
