@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
+ * Copyright (c) 2023-2025, The Electrostatic-Sandbox Distributed Simulation Framework, jSnapLoader
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,24 +30,42 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package electrostatic4j.snaploader.throwable;
+package electrostatic4j.snaploader.util;
+
+import electrostatic4j.snaploader.LoadingCriterion;
 
 /**
- * A business error of type {@link Error} to indicate an unsupported system.
- * <p>
- * This error is thrown when all the user-defined platform predicates are not met!
+ * A record-like structure representing immutable
+ * state objects for a calling stack invoking the
+ * library loading.
  *
- * @author pavl_g
+ * @author pavl_g.
  */
-public class UnSupportedSystemError extends Error {
-    
-    /**
-     * Thrown if the system detects an unsupported system binaries of the current OS.
-     * 
-     * @param os the current operating system (os) name
-     * @param arch the current operating system (os) processor architecture 
-     */
-    public UnSupportedSystemError(final String os, final String arch) {
-        super("Platform of OS(" + os + ") and ARCH(" + arch + ") isn't supported yet!");
+public final class CallingStackMetaData {
+    private final StackTraceElement callingStack;
+    private final LoadingCriterion loadingCriterion;
+    private Throwable errorCause;
+
+    public CallingStackMetaData(StackTraceElement callingStack, LoadingCriterion loadingCriterion,
+                                Throwable errorCause) {
+        this(callingStack, loadingCriterion);
+        this.errorCause = errorCause;
+    }
+
+    public CallingStackMetaData(StackTraceElement callingStack, LoadingCriterion loadingCriterion) {
+        this.callingStack = callingStack;
+        this.loadingCriterion = loadingCriterion;
+    }
+
+    public LoadingCriterion getLoadingCriterion() {
+        return loadingCriterion;
+    }
+
+    public StackTraceElement getCallingStack() {
+        return callingStack;
+    }
+
+    public Throwable getErrorCause() {
+        return errorCause;
     }
 }
