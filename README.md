@@ -51,7 +51,7 @@ BUILD SUCCESSFUL in 1s
 [build.gradle]
 ```groovy
 dependencies {
-    implementation "io.github.electrostat-lab:snaploader:1.1.0-stable"
+    implementation "io.github.electrostat-lab:snaploader:1.1.1-stable"
 }
 ```
 [settings.gradle]
@@ -91,14 +91,13 @@ https://github.com/Electrostat-Lab/jSnapLoader/blob/ac841ca914c1aba82c3bea0dfb31
 - [Electrostatic4j's Implementation - essentially the same](https://github.com/Electrostat-Lab/Electrostatic-Sandbox/blob/master/electrostatic-sandbox-framework/electrostatic4j/electrostatic4j-core/src/main/java/electrostatic4j/util/loader/NativeImageLoader.java)
 
 4) Extract and load libraries with user-defined fallback routines for anti-loading failure:
-> Introduced in 1.1.0-stable.
-```java
+> Introduced in 1.1.1-stable.
 
-```
+https://github.com/Electrostat-Lab/jSnapLoader/blob/39613458ff2abd1ecb34a0f909ed70ec4ced4983/snaploader-examples/src/main/java/electrostatic4j/snaploader/examples/api/NativeDllLoader.java#L52-L302
 
 5) Load libraries supporting specific CPU features by testing for those ISA Extensions using `NativeVariant.Cpu.hasExtensions(...)`:
 > Introduced in 1.1.0-stable.
-* See Example: 
+
 https://github.com/Electrostat-Lab/jSnapLoader/blob/a13f2ee12116f5538ec51b3eae8aaa0c3df634a0/snaploader-examples/src/main/java/electrostatic4j/snaploader/examples/TestCpuFeatures.java#L43-L90
 
 ## Appendix:
