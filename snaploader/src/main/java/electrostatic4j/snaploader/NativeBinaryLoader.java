@@ -201,8 +201,9 @@ public class NativeBinaryLoader {
      *
      * @param loggingEnabled true to enable logging, false otherwise
      */
-    public void setLoggingEnabled(boolean loggingEnabled) {
+    public NativeBinaryLoader setLoggingEnabled(boolean loggingEnabled) {
         SnapLoaderLogger.setLoggingEnabled(loggingEnabled);
+        return this;
     }
 
     /**
@@ -219,8 +220,9 @@ public class NativeBinaryLoader {
      *
      * @param retryWithCleanExtraction true to enable the flag, false otherwise
      */
-    public void setRetryWithCleanExtraction(boolean retryWithCleanExtraction) {
+    public NativeBinaryLoader setRetryWithCleanExtraction(boolean retryWithCleanExtraction) {
         this.retryWithCleanExtraction = retryWithCleanExtraction;
+        return this;
     }
 
     public List<NativeDynamicLibrary> getRegisteredLibraries() {
@@ -231,36 +233,41 @@ public class NativeBinaryLoader {
         return nativeBinaryLoadingListener;
     }
 
-    public void setNativeBinaryLoadingListener(NativeBinaryLoadingListener nativeBinaryLoadingListener) {
+    public NativeBinaryLoader setNativeBinaryLoadingListener(NativeBinaryLoadingListener nativeBinaryLoadingListener) {
         this.nativeBinaryLoadingListener = nativeBinaryLoadingListener;
+        return this;
     }
 
     public SystemDetectionListener getSystemDetectionListener() {
         return systemDetectionListener;
     }
 
-    public void setSystemDetectionListener(SystemDetectionListener systemDetectionListener) {
+    public NativeBinaryLoader setSystemDetectionListener(SystemDetectionListener systemDetectionListener) {
         this.systemDetectionListener = systemDetectionListener;
+        return this;
     }
 
     public FileExtractionListener getLibraryExtractionListener() {
         return libraryExtractionListener;
     }
 
-    public void setLibraryExtractionListener(FileExtractionListener libraryExtractionListener) {
+    public NativeBinaryLoader setLibraryExtractionListener(FileExtractionListener libraryExtractionListener) {
         this.libraryExtractionListener = libraryExtractionListener;
+        return this;
     }
 
     public FileLocalizingListener getLibraryLocalizingListener() {
         return libraryLocalizingListener;
     }
 
-    public void setLibraryLocalizingListener(FileLocalizingListener libraryLocalizingListener) {
+    public NativeBinaryLoader setLibraryLocalizingListener(FileLocalizingListener libraryLocalizingListener) {
         this.libraryLocalizingListener = libraryLocalizingListener;
+        return this;
     }
 
-    public void setMaxNumberOfLoadingFailure(int maxNumberOfLoadingFailure) {
+    public NativeBinaryLoader setMaxNumberOfLoadingFailure(int maxNumberOfLoadingFailure) {
         this.maxNumberOfLoadingFailure = Math.abs(maxNumberOfLoadingFailure);
+        return this;
     }
 
     /**
