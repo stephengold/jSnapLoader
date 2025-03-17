@@ -75,61 +75,15 @@ dependencyResolutionManagement {
 ```
 ### Library Implementation: 
 1) The most straightforward way: 
-```java
-final LibraryInfo info = new LibraryInfo(new DirectoryPath("lib/independent"), "basename", DirectoryPath.USER_DIR);
-// or
-// final LibraryInfo info = new LibraryInfo(DirectoryPath.CLASS_PATH,
-//      new DirectoryPath("lib/independent"), "basename", DirectoryPath.USER_DIR);
-final NativeBinaryLoader loader = new NativeBinaryLoader(info);
-final NativeDynamicLibrary[] libraries = new NativeDynamicLibrary[] {
-      new NativeDynamicLibrary("lib/linux/x86-64", PlatformPredicate.LINUX_X86_64),
-      new NativeDynamicLibrary("lib/macos/arm-64", PlatformPredicate.MACOS_ARM_64),
-      new NativeDynamicLibrary("lib/macos/x86-64", PlatformPredicate.MACOS_X86_64),
-      new NativeDynamicLibrary("lib/win/x86-64", PlatformPredicate.WIN_X86_64)
-      ...
-};
-loader.registerNativeLibraries(libraries).initPlatformLibrary();
-loader.setLoggingEnabled(true);
-loader.setRetryWithCleanExtraction(true);
-try {
-      loader.loadLibrary(LoadingCriterion.INCREMENTAL_LOADING);
-} catch (IOException e) {
-      Logger.getLogger(NativeBinaryLoader.class.getName()
-            .log(Level.SEVERE, "Native loader has failed!", e);
-}
-```
+https://github.com/Electrostat-Lab/jSnapLoader/blob/ac841ca914c1aba82c3bea0dfb3176a094712c7e/snaploader-examples/src/main/java/electrostatic4j/snaploader/examples/TestCrossPlatformClassPathLoading.java#L44-L72
+
 - This way utilizes the classpath on the stock Jar archive to locate, extract and load the native binaries.
 - It first defines a library info object with a pointer to the classpath (aka. wrapped null string path), and a default path that will be
 used in case the platform path for the selected platform predicate is not assigned, then a `basename` for the library to be operated, and finally the current working directory as an extraction path.
 
 2) A Superior control:
-```java
-import java.nio.file.Path;
-import java.nio.file.Paths;
-...
-// compatible with Java 8, Since 1.7
-final Path compression = Paths.get(PropertiesProvider.USER_DIR.getSystemProperty(), "libs", "electrostatic4j.jar");
-// create extraction path directory if not exists
-final Path extractionPath = Files.createDirectories(Paths.get(PropertiesProvider.USER_DIR.getSystemProperty(), "libs", "natives"));
-final LibraryInfo info = new LibraryInfo(new DirectoryPath(compression.toString()), new DirectoryPath("lib/independent"), "electrostatic4j", new DirectoryPath(extractionPath.toString()));
-final NativeBinaryLoader loader = new NativeBinaryLoader(info);
-final NativeDynamicLibrary[] libraries = new NativeDynamicLibrary[] {
-      new NativeDynamicLibrary("lib/linux/x86-64", PlatformPredicate.LINUX_X86_64),
-      new NativeDynamicLibrary("lib/macos/arm-64", PlatformPredicate.MACOS_ARM_64),
-      new NativeDynamicLibrary("lib/macos/x86-64", PlatformPredicate.MACOS_X86_64),
-      new NativeDynamicLibrary("lib/win/x86-64", PlatformPredicate.WIN_X86_64)
-      ...
-};
-loader.registerNativeLibraries(libraries).initPlatformLibrary();
-loader.setLoggingEnabled(true);
-loader.setRetryWithCleanExtraction(true);
-try {
-      loader.loadLibrary(LoadingCriterion.INCREMENTAL_LOADING);
-} catch (IOException e) {
-      Logger.getLogger(NativeBinaryLoader.class.getName()
-            .log(Level.SEVERE, "Native loader has failed!", e);
-}
-```
+https://github.com/Electrostat-Lab/jSnapLoader/blob/ac841ca914c1aba82c3bea0dfb3176a094712c7e/snaploader-examples/src/main/java/electrostatic4j/snaploader/examples/TestBasicFeatures2.java#L48-L82
+
 - This way utilizes the `java.nio.file.Paths` and `java.nio.file.Path` APIs to build platform-independent directory paths, and it's deemed the most superior way, especially for vague systems; thus it's considered the most robust way, and the best cross-platform strategy; because it depends on the Java implementation for this specific runtime.
 
 3) Full control (external Jar localizing, platform predicates, and platform-independent extraction paths):
