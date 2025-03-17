@@ -136,6 +136,17 @@ try {
 - [Serial4j's Implementation - `NativeImageLoader`](https://github.com/Electrostat-Lab/Serial4j/blob/master/serial4j/src/main/java/com/serial4j/util/loader/NativeImageLoader.java)
 - [Electrostatic4j's Implementation - essentially the same](https://github.com/Electrostat-Lab/Electrostatic-Sandbox/blob/master/electrostatic-sandbox-framework/electrostatic4j/electrostatic4j-core/src/main/java/electrostatic4j/util/loader/NativeImageLoader.java)
 
+4) Extract and load libraries with user-defined fallback routines for anti-loading failure:
+> Introduced in 1.1.0-stable.
+```java
+
+```
+
+5) Load libraries supporting specific CPU features by testing for those ISA Extensions using `NativeVariant.Cpu.hasExtensions(...)`:
+> Introduced in 1.1.0-stable.
+* See Example: 
+https://github.com/Electrostat-Lab/jSnapLoader/blob/a13f2ee12116f5538ec51b3eae8aaa0c3df634a0/snaploader-examples/src/main/java/electrostatic4j/snaploader/examples/TestCpuFeatures.java#L43-L90
+
 ## Appendix:
 ### Features:
 - [x] Platform-specific dynamic libraries' registration.
@@ -151,7 +162,10 @@ try {
 - [x] EventDispatchers: Extraction Listeners, Loading Listeners, and System Detection Listeners.
 - [x] Filesystem Failure Throwable Exceptions: binds the user API to the jSnapLoader lifecycle.
 - [x] Tight handling of memory leaks; as a result of file locator and/or file extractor failures.
-- [x] Memory logging of the stream providers' handlers using the object hash keys. 
+- [x] Memory logging of the stream providers' handlers using the object hash keys.
+- [x] CPU Features check (**NEW**).
+- [x] Framework-based loaded classes check (**NEW**).
+- [x] Load libraries from System Directories (Note: Default Mode for Android). 
 - [ ] Extract automatically based on the application name and version.
 
 ### Documentation-list:
