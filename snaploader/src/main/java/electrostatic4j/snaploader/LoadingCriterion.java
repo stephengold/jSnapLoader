@@ -32,6 +32,8 @@
 
 package electrostatic4j.snaploader;
 
+import electrostatic4j.snaploader.util.CallingStackMetaData;
+
 /**
  * Represents an extraction/loading criterion type.
  * 
@@ -127,7 +129,8 @@ public enum LoadingCriterion {
      * This approach requires the library to be present on the system beforehand.
      * If the library is missing, the loading process will fail with an {@code UnsatisfiedLinkError}.
      * To ensure compatibility across different systems, consider providing a fallback
-     * mechanism to extract the library dynamically when needed via {@link NativeBinaryLoadingListener#onLoadingFailure(NativeBinaryLoader)}.
+     * mechanism to extract the library dynamically whenever required
+     * via {@link NativeBinaryLoadingListener#onLoadingFailure(NativeBinaryLoader, CallingStackMetaData)}.
      * </p>
      */
     SYSTEM_LOAD
