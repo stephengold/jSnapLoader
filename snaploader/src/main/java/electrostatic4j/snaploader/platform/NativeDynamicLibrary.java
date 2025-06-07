@@ -183,6 +183,10 @@ public class NativeDynamicLibrary {
                 + DefaultPropertiesProvider.FILE_SEPARATOR.getSystemProperty() + libraryFile;
     }
 
+    public String getLibraryFile() {
+        return libraryFile;
+    }
+
     /**
      * Tests whether the native library is extracted to the specified extraction directory.
      * 
