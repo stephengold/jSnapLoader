@@ -42,7 +42,7 @@ import electrostatic4j.snaploader.platform.util.DefaultDynamicLibraries;
 import electrostatic4j.snaploader.platform.NativeDynamicLibrary;
 import electrostatic4j.snaploader.platform.util.NativeVariant;
 import electrostatic4j.snaploader.platform.util.PlatformPredicate;
-import electrostatic4j.snaploader.platform.util.PropertiesProvider;
+import electrostatic4j.snaploader.platform.util.DefaultPropertiesProvider;
 import electrostatic4j.snaploader.LoadingCriterion;
 
 /**
@@ -55,8 +55,8 @@ public final class TestBasicFeatures2 {
 
     public static void main(String[] args) throws Exception {
 
-        final Path compressionPath = Paths.get(PropertiesProvider.USER_DIR.getSystemProperty(), "libs", TestBasicFeatures.getJarFile());
-        final Path extractionPath = Files.createDirectories(Paths.get(PropertiesProvider.USER_DIR.getSystemProperty(), "libs", 
+        final Path compressionPath = Paths.get(DefaultPropertiesProvider.USER_DIR.getSystemProperty(), "libs", TestBasicFeatures.getJarFile());
+        final Path extractionPath = Files.createDirectories(Paths.get(DefaultPropertiesProvider.USER_DIR.getSystemProperty(), "libs",
                                                                       NativeVariant.OS_NAME.getProperty(), NativeVariant.OS_ARCH.getProperty()));
 
         final LibraryInfo libraryInfo = new LibraryInfo(new DirectoryPath(compressionPath.toString()), new DirectoryPath("lib/placeholder"),
