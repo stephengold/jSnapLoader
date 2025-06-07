@@ -35,7 +35,7 @@ package electrostatic4j.snaploader.examples;
 import electrostatic4j.snaploader.filesystem.FileExtractionListener;
 import electrostatic4j.snaploader.filesystem.FileExtractor;
 import electrostatic4j.snaploader.filesystem.FileLocator;
-import electrostatic4j.snaploader.platform.util.PropertiesProvider;
+import electrostatic4j.snaploader.platform.util.DefaultPropertiesProvider;
 import electrostatic4j.snaploader.util.SnapLoaderLogger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,12 +78,12 @@ public class TestFilesystemMemoryLeak {
 
     protected static String getZipAbsolutePath() {
         return TestBasicFeatures.getLibrariesAbsolutePath().getPath() +
-                PropertiesProvider.FILE_SEPARATOR.getSystemProperty() + "jmelogo700.zip";
+                DefaultPropertiesProvider.FILE_SEPARATOR.getSystemProperty() + "jmelogo700.zip";
     }
 
     protected static String getExtractionPath() {
         return TestBasicFeatures.getLibrariesAbsolutePath().getPath() +
-                PropertiesProvider.FILE_SEPARATOR.getSystemProperty() + getFilePath();
+                DefaultPropertiesProvider.FILE_SEPARATOR.getSystemProperty() + getFilePath();
     }
 
     protected static String getFilePath() {

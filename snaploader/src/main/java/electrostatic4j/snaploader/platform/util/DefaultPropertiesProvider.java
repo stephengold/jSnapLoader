@@ -32,6 +32,63 @@
 
 package electrostatic4j.snaploader.platform.util;
 
-public interface PropertiesProvider {
-    String getSystemProperty();
+/**
+ * Provides platform-dependent system properties for the current running machine.
+ * 
+ * @author pavl_g
+ */
+public enum DefaultPropertiesProvider implements PropertiesProvider {
+    
+    /**
+     * Provides a string representation for the absolute directory
+     * of the current user directory.
+     */
+    USER_DIR(System.getProperty("user.dir")), 
+
+    /**
+     * Provides a string representation for the absolute directory 
+     * of the user home.
+     */
+    USER_HOME(System.getProperty("user.home")),
+
+    /**
+     * Provides a string representation for the platform-dependent filesystem separator.
+     */
+    FILE_SEPARATOR(System.getProperty("file.separator")),
+
+    /**
+     * Provides a string representation for the filesystem separator of the Zip specification.
+     */
+    ZIP_FILE_SEPARATOR("/"),
+
+    /**
+     * Provides a string representation for the absolute path of the 
+     * java interpreter binary.
+     */
+    JAVA_HOME(System.getProperty("java.home")),
+
+    SYSTEM_DIR(System.getProperty("jsnaploader.library.path")),
+
+    CLASS_PATH(System.getProperty("java.class.path"));
+    
+    private final String systemProperty;
+
+    /**
+     * Instantiates a platform-dependent property object.
+     * 
+     * @param systemProperty the string representation of the platform-dependent property
+     */
+    DefaultPropertiesProvider(String systemProperty) {
+        this.systemProperty = systemProperty;
+    }
+
+    /**
+     * Retrieves the platform-dependent property.
+     * 
+     * @return a string representation for the platform-dependent property
+     */
+    @Override
+    public String getSystemProperty() {
+        return systemProperty;
+    }
 }

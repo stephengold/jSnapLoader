@@ -348,4 +348,13 @@ public class NativeDllLoader implements NativeBinaryLoadingListener, FileLocaliz
         // signal an imminent failure and crash the application
         Runtime.getRuntime().exit(-callingStackMetaData.getErrorCause().hashCode());
     }
+
+    /**
+     * Retrieves the associated native binary loader object.
+     *
+     * @return a native binary loader object that is associated wtih this object.
+     */
+    public NativeBinaryLoader getLoader() {
+        return loader;
+    }
 }

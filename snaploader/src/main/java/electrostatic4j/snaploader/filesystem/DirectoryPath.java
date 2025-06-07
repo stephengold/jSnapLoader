@@ -32,7 +32,7 @@
 
 package electrostatic4j.snaploader.filesystem;
 
-import electrostatic4j.snaploader.platform.util.PropertiesProvider;
+import electrostatic4j.snaploader.platform.util.DefaultPropertiesProvider;
 
 /**
  * A class denotes and provides a directory absolute path.
@@ -45,13 +45,13 @@ public final class DirectoryPath {
      * An alias object for the current working directory absolute path.
      */
     public static final DirectoryPath USER_DIR =
-            new DirectoryPath(PropertiesProvider.USER_DIR.getSystemProperty());
+            new DirectoryPath(DefaultPropertiesProvider.USER_DIR.getSystemProperty());
 
     /**
      * An alias object for the root user home directory absolute path.
      */
     public static final DirectoryPath USER_HOME =
-            new DirectoryPath(PropertiesProvider.USER_HOME.getSystemProperty());
+            new DirectoryPath(DefaultPropertiesProvider.USER_HOME.getSystemProperty());
 
     /**
      * When combined with the
@@ -85,7 +85,7 @@ public final class DirectoryPath {
             if (entry == null) {
                 continue;
             }
-            path = getPath() + PropertiesProvider.FILE_SEPARATOR.getSystemProperty() + entry;
+            path = getPath() + DefaultPropertiesProvider.FILE_SEPARATOR.getSystemProperty() + entry;
         }
     }
 

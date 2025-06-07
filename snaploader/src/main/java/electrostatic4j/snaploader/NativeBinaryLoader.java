@@ -32,7 +32,9 @@
 
 package electrostatic4j.snaploader;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.util.Arrays;
 import java.util.List;
 import java.util.jar.JarFile;
@@ -45,6 +47,8 @@ import electrostatic4j.snaploader.library.LibraryExtractor;
 import electrostatic4j.snaploader.library.LibraryLocator;
 import electrostatic4j.snaploader.platform.NativeDynamicLibrary;
 import electrostatic4j.snaploader.platform.util.NativeVariant;
+import electrostatic4j.snaploader.platform.util.PropertiesControllerNamespace;
+import electrostatic4j.snaploader.platform.util.PropertiesController;
 import electrostatic4j.snaploader.throwable.LoadingRetryExhaustionException;
 import electrostatic4j.snaploader.throwable.UnSupportedSystemError;
 import electrostatic4j.snaploader.util.CallingStackMetaData;
@@ -89,11 +93,15 @@ public class NativeBinaryLoader {
 
     protected int numberOfLoadingFailure = 0;
 
+    private LoadingCriterion loadingCriterion; // cache the loading criterion for system controller use
+
     /**
      * Instantiates a native dynamic library loader to extract and load a system-specific native dynamic library.
      */
     public NativeBinaryLoader(final LibraryInfo libraryInfo) {
         this.libraryInfo = libraryInfo;
+        // initialize the system controller object
+        PropertiesControllerNamespace.systemDirectoryController.initialize();
     }
 
     /**
@@ -176,14 +184,17 @@ public class NativeBinaryLoader {
         }
         // commands and loads the library from the system directories
         if (NativeVariant.Os.isAndroid() || criterion == LoadingCriterion.SYSTEM_LOAD) {
-            loadSystemBinary();
+            loadSystemBinary(nativeDynamicLibrary);
+            loadingCriterion = LoadingCriterion.SYSTEM_LOAD;
             return this;
         }
         if (criterion == LoadingCriterion.INCREMENTAL_LOADING && nativeDynamicLibrary.isExtracted()) {
             loadBinary(nativeDynamicLibrary, criterion);
+            loadingCriterion = LoadingCriterion.INCREMENTAL_LOADING;
             return this;
         }
         cleanExtractBinary(nativeDynamicLibrary);
+        loadingCriterion = LoadingCriterion.CLEAN_EXTRACTION;
         return this;
     }
 
@@ -194,6 +205,10 @@ public class NativeBinaryLoader {
      */
     public NativeDynamicLibrary getNativeDynamicLibrary() {
         return nativeDynamicLibrary;
+    }
+
+    public PropertiesController getSystemDirectoryController() {
+        return PropertiesControllerNamespace.systemDirectoryController;
     }
 
     /**
@@ -271,12 +286,27 @@ public class NativeBinaryLoader {
     }
 
     /**
-     * Loads a native binary from the system directories into the process virtual
+     * Loads a native binary from the customized system directories into the process virtual
      * address space using the library basename in a platform-dependent way.
      */
-    protected void loadSystemBinary() {
+    protected void loadSystemBinary(NativeDynamicLibrary dynamicLibrary) {
+        SnapLoaderLogger.log(Level.INFO, getClass().getName(), "loadSystemBinary", "Loading library from the system: "
+                    + Arrays.toString(PropertiesControllerNamespace.systemDirectoryController.toList()));
         try {
-            System.loadLibrary(libraryInfo.getBaseName());
+            // use custom system directories for desktop ONLY!
+            if (NativeVariant.Os.isDesktop()) {
+                PropertiesControllerNamespace.systemDirectoryController.iterate(path -> {
+                    final File lib = new File(FileSystems.getDefault()
+                            .getPath(path.toString(),
+                                    dynamicLibrary.getLibraryFile()).toString());
+                    if (lib.exists()) {
+                        System.load(lib.getAbsolutePath());
+                    }
+                    return "";
+                });
+            } else {
+                System.loadLibrary(libraryInfo.getBaseName());
+            }
             SnapLoaderLogger.log(Level.INFO, getClass().getName(), "loadSystemBinary", "Successfully loaded library from the system: "
                     + libraryInfo.getBaseName());
             if (nativeBinaryLoadingListener != null) {

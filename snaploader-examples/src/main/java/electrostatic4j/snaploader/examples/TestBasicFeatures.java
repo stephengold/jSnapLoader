@@ -39,7 +39,7 @@ import electrostatic4j.snaploader.platform.util.DefaultDynamicLibraries;
 import electrostatic4j.snaploader.platform.NativeDynamicLibrary;
 import electrostatic4j.snaploader.platform.util.NativeVariant;
 import electrostatic4j.snaploader.platform.util.PlatformPredicate;
-import electrostatic4j.snaploader.platform.util.PropertiesProvider;
+import electrostatic4j.snaploader.platform.util.DefaultPropertiesProvider;
 import electrostatic4j.snaploader.LoadingCriterion;
 
 /**
@@ -92,7 +92,7 @@ public final class TestBasicFeatures {
     }
 
     protected static DirectoryPath getLibrariesAbsolutePath() {
-        return new DirectoryPath(PropertiesProvider.USER_DIR.getSystemProperty(), "libs");
+        return new DirectoryPath(DefaultPropertiesProvider.USER_DIR.getSystemProperty(), "libs");
     }
 
     protected static DirectoryPath getJarFilePath() {
@@ -101,7 +101,7 @@ public final class TestBasicFeatures {
 
     protected static String getNativeDynamicLibraryPath() {
         return getLibrariesAbsolutePath().getPath() +
-                    PropertiesProvider.FILE_SEPARATOR.getSystemProperty() + 
+                    DefaultPropertiesProvider.FILE_SEPARATOR.getSystemProperty() +
                     "lib" + getLibraryBaseName() + ".so";
     }
 

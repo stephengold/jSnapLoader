@@ -38,7 +38,7 @@ import electrostatic4j.snaploader.NativeBinaryLoader;
 import electrostatic4j.snaploader.filesystem.DirectoryPath;
 import electrostatic4j.snaploader.platform.util.NativeVariant;
 import electrostatic4j.snaploader.platform.util.PlatformPredicate;
-import electrostatic4j.snaploader.platform.util.PropertiesProvider;
+import electrostatic4j.snaploader.platform.util.DefaultPropertiesProvider;
 
 /**
  * Represents a filesystem to a platform-specific binary inside
@@ -170,7 +170,7 @@ public class NativeDynamicLibrary {
      * @return a string representing the library path within the jar compression
      */
     public String getCompressedLibrary() {
-        return platformDirectory + PropertiesProvider.ZIP_FILE_SEPARATOR.getSystemProperty() + libraryFile;
+        return platformDirectory + DefaultPropertiesProvider.ZIP_FILE_SEPARATOR.getSystemProperty() + libraryFile;
     }
 
     /**
@@ -180,7 +180,11 @@ public class NativeDynamicLibrary {
      */
     public String getExtractedLibrary() {
         return directoryPath.getPath()
-                + PropertiesProvider.FILE_SEPARATOR.getSystemProperty() + libraryFile;
+                + DefaultPropertiesProvider.FILE_SEPARATOR.getSystemProperty() + libraryFile;
+    }
+
+    public String getLibraryFile() {
+        return libraryFile;
     }
 
     /**
